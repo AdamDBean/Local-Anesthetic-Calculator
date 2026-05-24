@@ -1,6 +1,6 @@
 // Change this version string every time you push a major update
 // This forces the browser to treat it as a new file and clear the cache
-const CACHE_NAME = 'last-calc-v2'; 
+const CACHE_NAME = 'last-calc-v3'; 
 
 const ASSETS = [
   './',
