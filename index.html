@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Anesthetic Additive Toxicity Calculator</title>
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#007aff">
+    <link rel="apple-touch-icon" href="./icon-192.png">
+    <style>
+        :root {
+            --primary: #007aff;
+            --bg: #f5f5f7;
+            --surface: #ffffff;
+            --border: #e5e5ea;
+            --text-main: #1d1d1f;
+            --text-muted: #86868b;
+            --danger: #ff3b30;
+            --highlight-bg: #fff8eb;
+            --highlight-text: #c26900;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .header-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin: 0;
+            color: var(--text-main);
+            font-weight: 700;
+        }
+
+        .weight-card {
+            background-color: var(--surface);
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .weight-card label {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .weight-input {
+            width: 110px;
+            font-size: 20px;
+            font-weight: 700;
+            padding: 8px 12px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background-color: var(--bg);
+            color: var(--primary);
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .weight-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: var(--surface);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        h2 {
+            font-size: 18px;
+            margin: 0 0 15px 0;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 10px;
+        }
+
+        .card {
+            background-color: var(--surface);
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            padding: 12px 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        input[type="number"].table-input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: var(--bg);
+            box-sizing: border-box;
+            transition: 0.2s;
+        }
+
+        input[type="number"].table-input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: var(--surface);
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .output-text {
+            background-color: var(--highlight-bg);
+            color: var(--highlight-text);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 14px;
+            display: inline-block;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .btn {
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+
+        .btn-add {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            margin-top: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-add:hover {
+            background-color: #005bb5;
+            transform: translateY(-1px);
+        }
+
+        .btn-remove {
+            background-color: #ffe5e5;
+            color: var(--danger);
+            padding: 8px 12px;
+            font-size: 14px;
+        }
+
+        .btn-remove:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .summary-card {
+            background-color: var(--highlight-bg);
+            border: 2px solid #ffd8a8;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+        }
+
+        .summary-card span {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .summary-value {
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--highlight-text);
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header-section">
+        <h1>Local Anesthetic Calculator</h1>
+        <div class="weight-card">
+            <label for="weight">Patient Weight (kg)</label>
+            <input type="number" id="weight" class="weight-input" min="0" step="0.1" placeholder="e.g. 70" oninput="calculateAll()">
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Already Administered</h2>
+        <table id="administered-table">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">#</th>
+                    <th style="width: 220px;">Agent Name</th>
+                    <th>Concentration (%)</th>
+                    <th>Volume Given (mL)</th>
+                    <th>Dose Given</th>
+                    <th>Max Dose Reference</th>
+                    <th>Max Dose (This Patient)</th>
+                    <th>% Max Given</th>
+                    <th style="width: 50px;">Action</th>
+                </tr>
+            </thead>
+            <tbody id="administered-body">
+                <!-- Rows injected by JS -->
+            </tbody>
+        </table>
+        <button class="btn btn-add" onclick="addRow()">+ Add Agent</button>
+    </div>
+
+    <div class="card summary-card">
+        <span>Total percentage of maximum local dose given:</span>
+        <div class="summary-value" id="total-pct">0.00%</div>
+    </div>
+
+    <div class="card">
+        <h2>What do you want to give?</h2>
+        <table id="desired-table">
+            <thead>
+                <tr>
+                    <th style="width: 250px;">Agent Name</th>
+                    <th>Concentration (%)</th>
+                    <th>Max Dose Reference</th>
+                    <th>Max Dose (This Patient)</th>
+                    <th>Remaining Dose</th>
+                    <th>Remaining Volume</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        <select id="desired-name" onchange="calculateAll()">
+                            <!-- Options injected by JS -->
+                        </select>
+                    </td>
+                    <td>
+                        <input type="number" class="table-input" id="desired-conc" value="0.25" min="0" step="0.01" oninput="calculateAll()">
+                    </td>
+                    <td><div class="output-text" id="desired-max-ref">-</div></td>
+                    <td><div class="output-text" id="desired-max-pat">-</div></td>
+                    <td><div class="output-text" id="desired-rem-mg">-</div></td>
+                    <td><div class="output-text" id="desired-rem-ml">-</div></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const agents = {
+        "None": { WgtMax: 0, TotalMax: 0 },
+        "Bupivacaine": { WgtMax: 2.5, TotalMax: 175 },
+        "Bupivacaine + Epi": { WgtMax: 3, TotalMax: 200 },
+        "Lidocaine": { WgtMax: 4.5, TotalMax: 300 },
+        "Lidocaine + Epi": { WgtMax: 7, TotalMax: 500 },
+        "Ropivacaine": { WgtMax: 3, TotalMax: 200 },
+        "Mepivacaine": { WgtMax: 7, TotalMax: 400 },
+        "Chloroprocaine": { WgtMax: 3, TotalMax: 200 },
+        "Chloroprocaine + Epi": { WgtMax: 4.5, TotalMax: 300 },
+        "Procaine": { WgtMax: 7, TotalMax: 350 },
+        "Prilocaine": { WgtMax: 8, TotalMax: 500 },
+        "Levobupivacaine": { WgtMax: 2, TotalMax: 150 }
+    };
+
+    function getAgentOptions(selected = "None") {
+        let options = "";
+        for (let agent in agents) {
+            options += `<option value="${agent}" ${agent === selected ? "selected" : ""}>${agent}</option>`;
+        }
+        return options;
+    }
+
+    function getAgentData(agentName, weight) {
+        if (agentName === "None" || !agents[agentName]) return null;
+        let data = { ...agents[agentName] };
+        
+        // Apply Prilocaine exception
+        if (agentName === "Prilocaine" && weight > 70) {
+            data.TotalMax = 600;
+        }
+        return data;
+    }
+
+    let rowCount = 0;
+
+    function addRow() {
+        rowCount++;
+        const tbody = document.getElementById("administered-body");
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td class="row-num" style="color: #86868b; font-weight: bold;">${rowCount}</td>
+            <td>
+                <select class="agent-name" onchange="calculateAll()">
+                    ${getAgentOptions()}
+                </select>
+            </td>
+            <td><input type="number" class="table-input agent-conc" min="0" step="0.01" oninput="calculateAll()"></td>
+            <td><input type="number" class="table-input agent-vol" min="0" step="0.1" oninput="calculateAll()"></td>
+            <td><div class="output-text out-dose">-</div></td>
+            <td><div class="output-text out-max-ref">-</div></td>
+            <td><div class="output-text out-max-pat">-</div></td>
+            <td><div class="output-text out-pct">-</div></td>
+            <td><button class="btn btn-remove" onclick="removeRow(this)">X</button></td>
+        `;
+        tbody.appendChild(tr);
+        updateRowNumbers();
+        calculateAll();
+    }
+
+    function removeRow(btn) {
+        const tr = btn.closest("tr");
+        tr.remove();
+        updateRowNumbers();
+        calculateAll();
+    }
+
+    function updateRowNumbers() {
+        const rows = document.querySelectorAll("#administered-body tr");
+        rowCount = 0;
+        rows.forEach(row => {
+            rowCount++;
+            row.querySelector(".row-num").textContent = rowCount;
+        });
+    }
+
+    function calculateAll() {
+        const weightInput = parseFloat(document.getElementById("weight").value);
+        const weight = (isNaN(weightInput) || weightInput <= 0) ? 0 : weightInput;
+        
+        let totalPct = 0;
+
+        // Administered rows calculation
+        const rows = document.querySelectorAll("#administered-body tr");
+        rows.forEach(row => {
+            const name = row.querySelector(".agent-name").value;
+            const conc = parseFloat(row.querySelector(".agent-conc").value) || 0;
+            const vol = parseFloat(row.querySelector(".agent-vol").value) || 0;
+            
+            const doseCell = row.querySelector(".out-dose");
+            const refCell = row.querySelector(".out-max-ref");
+            const maxPatCell = row.querySelector(".out-max-pat");
+            const pctCell = row.querySelector(".out-pct");
+
+            if (name === "None" || weight === 0) {
+                doseCell.textContent = "-";
+                refCell.textContent = "-";
+                maxPatCell.textContent = "-";
+                pctCell.textContent = "-";
+                return;
+            }
+
+            const data = getAgentData(name, weight);
+            
+            // Max Dose Reference
+            refCell.textContent = `${data.WgtMax} mg/kg (Max ${data.TotalMax} mg)`;
+            
+            // Patient Max Dose (mg)
+            const maxPatDose = Math.min(weight * data.WgtMax, data.TotalMax);
+            maxPatCell.textContent = maxPatDose.toFixed(2) + " mg";
+            
+            // Dose Given (mg)
+            const doseGiven = conc * 10 * vol;
+            if (doseGiven > 0) {
+                doseCell.textContent = doseGiven.toFixed(2) + " mg";
+            } else {
+                doseCell.textContent = "-";
+            }
+            
+            // % Max Given
+            let pctMax = 0;
+            if (maxPatDose > 0) {
+                pctMax = (doseGiven / maxPatDose) * 100;
+            }
+            
+            if (doseGiven > 0) {
+                pctCell.textContent = pctMax.toFixed(2) + "%";
+            } else {
+                pctCell.textContent = "-";
+            }
+            
+            totalPct += pctMax;
+        });
+
+        // Update Total %
+        document.getElementById("total-pct").textContent = weight > 0 ? totalPct.toFixed(2) + "%" : "0.00%";
+
+        // Desired agent calculation
+        const desiredName = document.getElementById("desired-name").value;
+        const desiredConc = parseFloat(document.getElementById("desired-conc").value) || 0;
+        
+        const desRefCell = document.getElementById("desired-max-ref");
+        const desMaxPatCell = document.getElementById("desired-max-pat");
+        const desRemMgCell = document.getElementById("desired-rem-mg");
+        const desRemMlCell = document.getElementById("desired-rem-ml");
+
+        if (desiredName === "None" || weight === 0) {
+            desRefCell.textContent = "-";
+            desMaxPatCell.textContent = "-";
+            desRemMgCell.textContent = "-";
+            desRemMlCell.textContent = "-";
+            return;
+        }
+
+        const desData = getAgentData(desiredName, weight);
+        desRefCell.textContent = `${desData.WgtMax} mg/kg (Max ${desData.TotalMax} mg)`;
+        
+        const desMaxPatDose = Math.min(weight * desData.WgtMax, desData.TotalMax);
+        desMaxPatCell.textContent = desMaxPatDose.toFixed(2) + " mg";
+
+        let remainingPct = Math.max(0, 100 - totalPct);
+        let remMg = desMaxPatDose * (remainingPct / 100);
+        
+        desRemMgCell.textContent = remMg.toFixed(2) + " mg";
+        
+        if (desiredConc > 0) {
+            let remMl = remMg / (desiredConc * 10);
+            desRemMlCell.textContent = remMl.toFixed(2) + " mL";
+        } else {
+            desRemMlCell.textContent = "0.00 mL";
+        }
+    }
+
+    // Initialize Options for Desired Agent Dropdown
+    window.onload = function() {
+        const desSelect = document.getElementById("desired-name");
+        let options = "";
+        for (let agent in agents) {
+            if(agent !== "None") {
+                options += `<option value="${agent}" ${agent === "Bupivacaine" ? "selected" : ""}>${agent}</option>`;
+            }
+        }
+        desSelect.innerHTML = options;
+        addRow(); // Start with one row
+    };
+</script>
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful');
+                })
+                .catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+        });
+    }
+</script>
+</body>
+</html>
