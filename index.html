@@ -335,7 +335,8 @@
                 </tr>
             </thead>
             <tbody id="administered-body">
-                </tbody>
+                <!-- Rows injected by JS -->
+            </tbody>
         </table>
         <div class="button-group">
             <button class="btn btn-add" onclick="addRow()">+ Add Agent</button>
@@ -365,7 +366,8 @@
                 <tr>
                     <td data-label="Agent Name">
                         <select id="desired-name" onchange="calculateAll()">
-                            </select>
+                            <!-- Options injected by JS -->
+                        </select>
                     </td>
                     <td data-label="Concentration (%)">
                         <input type="number" class="table-input" id="desired-conc" value="0.25" min="0" step="0.01" oninput="calculateAll()">
@@ -458,7 +460,6 @@
     }
 
     function clearAll() {
-        // Confirm before wiping data in case of accidental click on a mobile screen
         if(confirm("Clear all patient and medication data?")) {
             document.getElementById("weight").value = "";
             document.getElementById("administered-body").innerHTML = "";
@@ -468,7 +469,6 @@
             document.getElementById("desired-name").value = "Bupivacaine";
             document.getElementById("desired-conc").value = "0.25";
             
-            addRow(); // Inject one clean row to start
             calculateAll();
         }
     }
@@ -572,11 +572,10 @@
             }
         }
         desSelect.innerHTML = options;
-        addRow();
+        calculateAll();
     };
 </script>
 <script>
-    // Updated Service Worker Registration Logic
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
@@ -584,7 +583,6 @@
                     console.log('ServiceWorker registered');
                 });
 
-            // This ensures the page reloads automatically when the new service worker takes over
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
                 if (!refreshing) {
