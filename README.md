@@ -30,14 +30,7 @@ The calculator uses the following baseline pharmacological limits:
 
 ## Installation & Usage
 
-Because this app is a PWA, it can be hosted for free on GitHub Pages and installed natively on iOS or Android.
-
-### Hosting on GitHub Pages
-1. Push the repository files (`index.html`, `manifest.json`, `sw.js`, and the icons) to the `main` branch.
-2. Navigate to your repository's **Settings** > **Pages**.
-3. Under "Build and deployment", set the source to **Deploy from a branch**.
-4. Select the `main` branch and `/ (root)` folder, then click **Save**.
-5. Wait a few minutes for GitHub to build the site. Your live URL will appear at the top of the Pages settings.
+Because this app is a PWA it can be installed natively on iOS or Android.
 
 ### Installing on a Mobile Device
 1. Open the live GitHub Pages URL in your mobile browser (Safari for iOS, Chrome for Android).
