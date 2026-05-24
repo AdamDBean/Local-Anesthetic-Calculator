@@ -211,6 +211,87 @@
             color: var(--highlight-text);
         }
 
+        /* Responsive Mobile Layout (Vertical Cards) */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px 10px;
+            }
+
+            .header-section {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+
+            h1 {
+                font-size: 24px;
+                text-align: center;
+            }
+
+            .weight-card {
+                justify-content: space-between;
+            }
+
+            .summary-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+                padding: 20px;
+            }
+
+            /* Force table to not behave like a table */
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            /* Hide table headers on mobile */
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            /* Treat each row as a card */
+            tr {
+                background-color: #fafafa;
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                margin-bottom: 20px;
+                padding: 15px;
+            }
+
+            /* Flex layout for each cell to display label + value */
+            td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border: none;
+                border-bottom: 1px solid #eee;
+                padding: 10px 0;
+                text-align: right;
+            }
+
+            td:last-child {
+                border-bottom: none;
+                justify-content: flex-end;
+            }
+
+            /* Generate the label using the data-label attribute */
+            td::before {
+                content: attr(data-label);
+                font-size: 13px;
+                font-weight: 600;
+                text-transform: uppercase;
+                color: var(--text-muted);
+                margin-right: 15px;
+                text-align: left;
+            }
+
+            input[type="number"].table-input, select {
+                width: 60%;
+                text-align: right;
+            }
+        }
     </style>
 </head>
 <body>
@@ -241,8 +322,7 @@
                 </tr>
             </thead>
             <tbody id="administered-body">
-                <!-- Rows injected by JS -->
-            </tbody>
+                </tbody>
         </table>
         <button class="btn btn-add" onclick="addRow()">+ Add Agent</button>
     </div>
@@ -267,18 +347,17 @@
             </thead>
             <tbody>
                 <tr>
-                    <td>
+                    <td data-label="Agent Name">
                         <select id="desired-name" onchange="calculateAll()">
-                            <!-- Options injected by JS -->
-                        </select>
+                            </select>
                     </td>
-                    <td>
+                    <td data-label="Concentration (%)">
                         <input type="number" class="table-input" id="desired-conc" value="0.25" min="0" step="0.01" oninput="calculateAll()">
                     </td>
-                    <td><div class="output-text" id="desired-max-ref">-</div></td>
-                    <td><div class="output-text" id="desired-max-pat">-</div></td>
-                    <td><div class="output-text" id="desired-rem-mg">-</div></td>
-                    <td><div class="output-text" id="desired-rem-ml">-</div></td>
+                    <td data-label="Max Dose Reference"><div class="output-text" id="desired-max-ref">-</div></td>
+                    <td data-label="Max Dose (This Patient)"><div class="output-text" id="desired-max-pat">-</div></td>
+                    <td data-label="Remaining Dose"><div class="output-text" id="desired-rem-mg">-</div></td>
+                    <td data-label="Remaining Volume"><div class="output-text" id="desired-rem-ml">-</div></td>
                 </tr>
             </tbody>
         </table>
@@ -313,7 +392,6 @@
         if (agentName === "None" || !agents[agentName]) return null;
         let data = { ...agents[agentName] };
         
-        // Apply Prilocaine exception
         if (agentName === "Prilocaine" && weight > 70) {
             data.TotalMax = 600;
         }
@@ -326,20 +404,22 @@
         rowCount++;
         const tbody = document.getElementById("administered-body");
         const tr = document.createElement("tr");
+        
+        // Added data-labels to dynamically injected JS rows
         tr.innerHTML = `
-            <td class="row-num" style="color: #86868b; font-weight: bold;">${rowCount}</td>
-            <td>
+            <td data-label="Agent #" class="row-num" style="color: #86868b; font-weight: bold;">${rowCount}</td>
+            <td data-label="Agent Name">
                 <select class="agent-name" onchange="calculateAll()">
                     ${getAgentOptions()}
                 </select>
             </td>
-            <td><input type="number" class="table-input agent-conc" min="0" step="0.01" oninput="calculateAll()"></td>
-            <td><input type="number" class="table-input agent-vol" min="0" step="0.1" oninput="calculateAll()"></td>
-            <td><div class="output-text out-dose">-</div></td>
-            <td><div class="output-text out-max-ref">-</div></td>
-            <td><div class="output-text out-max-pat">-</div></td>
-            <td><div class="output-text out-pct">-</div></td>
-            <td><button class="btn btn-remove" onclick="removeRow(this)">X</button></td>
+            <td data-label="Concentration (%)"><input type="number" class="table-input agent-conc" min="0" step="0.01" oninput="calculateAll()"></td>
+            <td data-label="Volume Given (mL)"><input type="number" class="table-input agent-vol" min="0" step="0.1" oninput="calculateAll()"></td>
+            <td data-label="Dose Given"><div class="output-text out-dose">-</div></td>
+            <td data-label="Max Dose Reference"><div class="output-text out-max-ref">-</div></td>
+            <td data-label="Max Dose (This Patient)"><div class="output-text out-max-pat">-</div></td>
+            <td data-label="% Max Given"><div class="output-text out-pct">-</div></td>
+            <td data-label="Remove"><button class="btn btn-remove" onclick="removeRow(this)">X</button></td>
         `;
         tbody.appendChild(tr);
         updateRowNumbers();
@@ -368,7 +448,6 @@
         
         let totalPct = 0;
 
-        // Administered rows calculation
         const rows = document.querySelectorAll("#administered-body tr");
         rows.forEach(row => {
             const name = row.querySelector(".agent-name").value;
@@ -390,14 +469,11 @@
 
             const data = getAgentData(name, weight);
             
-            // Max Dose Reference
             refCell.textContent = `${data.WgtMax} mg/kg (Max ${data.TotalMax} mg)`;
             
-            // Patient Max Dose (mg)
             const maxPatDose = Math.min(weight * data.WgtMax, data.TotalMax);
             maxPatCell.textContent = maxPatDose.toFixed(2) + " mg";
             
-            // Dose Given (mg)
             const doseGiven = conc * 10 * vol;
             if (doseGiven > 0) {
                 doseCell.textContent = doseGiven.toFixed(2) + " mg";
@@ -405,7 +481,6 @@
                 doseCell.textContent = "-";
             }
             
-            // % Max Given
             let pctMax = 0;
             if (maxPatDose > 0) {
                 pctMax = (doseGiven / maxPatDose) * 100;
@@ -420,10 +495,8 @@
             totalPct += pctMax;
         });
 
-        // Update Total %
         document.getElementById("total-pct").textContent = weight > 0 ? totalPct.toFixed(2) + "%" : "0.00%";
 
-        // Desired agent calculation
         const desiredName = document.getElementById("desired-name").value;
         const desiredConc = parseFloat(document.getElementById("desired-conc").value) || 0;
         
@@ -459,7 +532,6 @@
         }
     }
 
-    // Initialize Options for Desired Agent Dropdown
     window.onload = function() {
         const desSelect = document.getElementById("desired-name");
         let options = "";
@@ -469,7 +541,7 @@
             }
         }
         desSelect.innerHTML = options;
-        addRow(); // Start with one row
+        addRow();
     };
 </script>
 <script>
