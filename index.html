@@ -190,6 +190,24 @@
             color: white;
         }
 
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-clear {
+            background-color: #f5f5f7;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 10px 20px;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        .btn-clear:hover {
+            background-color: #e5e5ea;
+        }
+
         .summary-card {
             background-color: var(--highlight-bg);
             border: 2px solid #ffd8a8;
@@ -239,19 +257,16 @@
                 padding: 20px;
             }
 
-            /* Force table to not behave like a table */
             table, thead, tbody, th, td, tr {
                 display: block;
             }
 
-            /* Hide table headers on mobile */
             thead tr {
                 position: absolute;
                 top: -9999px;
                 left: -9999px;
             }
 
-            /* Treat each row as a card */
             tr {
                 background-color: #fafafa;
                 border: 1px solid var(--border);
@@ -260,7 +275,6 @@
                 padding: 15px;
             }
 
-            /* Flex layout for each cell to display label + value */
             td {
                 display: flex;
                 justify-content: space-between;
@@ -276,7 +290,6 @@
                 justify-content: flex-end;
             }
 
-            /* Generate the label using the data-label attribute */
             td::before {
                 content: attr(data-label);
                 font-size: 13px;
@@ -324,7 +337,10 @@
             <tbody id="administered-body">
                 </tbody>
         </table>
-        <button class="btn btn-add" onclick="addRow()">+ Add Agent</button>
+        <div class="button-group">
+            <button class="btn btn-add" onclick="addRow()">+ Add Agent</button>
+            <button class="btn btn-clear" onclick="clearAll()">Clear All</button>
+        </div>
     </div>
 
     <div class="card summary-card">
@@ -405,7 +421,6 @@
         const tbody = document.getElementById("administered-body");
         const tr = document.createElement("tr");
         
-        // Added data-labels to dynamically injected JS rows
         tr.innerHTML = `
             <td data-label="Agent #" class="row-num" style="color: #86868b; font-weight: bold;">${rowCount}</td>
             <td data-label="Agent Name">
@@ -440,6 +455,22 @@
             rowCount++;
             row.querySelector(".row-num").textContent = rowCount;
         });
+    }
+
+    function clearAll() {
+        // Confirm before wiping data in case of accidental click on a mobile screen
+        if(confirm("Clear all patient and medication data?")) {
+            document.getElementById("weight").value = "";
+            document.getElementById("administered-body").innerHTML = "";
+            rowCount = 0;
+            
+            // Reset desired inputs
+            document.getElementById("desired-name").value = "Bupivacaine";
+            document.getElementById("desired-conc").value = "0.25";
+            
+            addRow(); // Inject one clean row to start
+            calculateAll();
+        }
     }
 
     function calculateAll() {
@@ -545,15 +576,22 @@
     };
 </script>
 <script>
+    // Updated Service Worker Registration Logic
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('./sw.js')
                 .then(registration => {
-                    console.log('ServiceWorker registration successful');
-                })
-                .catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
+                    console.log('ServiceWorker registered');
                 });
+
+            // This ensures the page reloads automatically when the new service worker takes over
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    window.location.reload();
+                    refreshing = true;
+                }
+            });
         });
     }
 </script>
